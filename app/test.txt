@@ -1,0 +1,209 @@
+{/* Hero Carousel - New Visual Theme */}
+      <section className="relative w-full overflow-hidden">
+        <div className="absolute inset-0" />
+        <div className="container relative px-3 py-4 mx-auto max-w-7xl md:px-4 md:py-8">
+          
+          {/* Carousel Content */}
+          <div 
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            <AnimatePresence mode="wait">
+              {heroSlides.map((slide, index) => index === currentSlide && (
+                <motion.div
+                  key={slide.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  {/* Mobile: Compact Horizontal Card */}
+                  <div className="md:hidden">
+                    <div className="relative flex gap-3 p-3 overflow-hidden border shadow-2xl bg-white/95 rounded-2xl border-[#f3cfb5]">
+                      {/* Discount Badge */}
+                      {slide.discount && (
+                        <div className="absolute z-10 px-2 py-1 text-xs font-black text-white transform rounded-lg shadow-lg bg-[#b84f03] -rotate-3 top-1 left-1">
+                          🔥 -{slide.discount}%
+                        </div>
+                      )}
+
+                      {/* Product Image - Right Side */}
+                      <div className="flex-shrink-0 w-24">
+                        <OptimizedImage
+                          src={slide.image}
+                          alt={slide.title}
+                          width={96}
+                          height={96}
+                          className="object-contain w-full h-24"
+                          priority={index === 0}
+                          quality={75}
+                        />
+                      </div>
+
+                      {/* Product Info - Left Side */}
+                      <div className="flex flex-col justify-center flex-1 min-w-0">
+                        <h2 className="mb-0.5 text-sm font-black text-gray-900 truncate">
+                          {slide.title}
+                        </h2>
+                        <p className="mb-1 text-xs text-gray-600 truncate">
+                          {slide.subtitle}
+                        </p>
+                        
+                        {/* Price Row */}
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="text-lg font-black text-[#db5f02]">
+                            {slide.newPrice} ج.م
+                          </span>
+                          <span className="text-xs text-gray-400 line-through">
+                            {slide.oldPrice}
+                          </span>
+                        </div>
+
+                        {/* CTA Button */}
+                        <Link
+                          href={slide.ctaLink}
+                          className="inline-flex items-center self-start justify-center gap-1 px-3 py-1.5 text-xs font-bold text-white rounded-lg bg-[#db5f02] hover:bg-[#b84f03]"
+                        >
+                          اطلب الآن 🛒
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Desktop: Full Layout */}
+                  <div className="hidden gap-6 md:grid md:grid-cols-2 md:gap-10">
+                    
+                    {/* Content Side */}
+                    <div className="flex flex-col order-2 text-center md:order-1 md:text-right">
+                      
+                      {/* Title */}
+                      <h1 className="mb-2 text-2xl font-black text-white md:mb-3 md:text-5xl lg:text-6xl drop-shadow-sm">
+                        {slide.title}
+                      </h1>
+
+                      {/* Subtitle */}
+                      <p className="mb-4 text-base font-bold text-white/90 md:mb-5 md:text-xl">
+                        {slide.subtitle}
+                      </p>
+
+                      {/* Price Card */}
+                      <div className="self-center p-4 mb-4 border shadow-2xl bg-white/95 border-[#f3cfb5] md:self-start rounded-2xl md:p-5 md:mb-5">
+                        <div className="flex items-end gap-2 mb-2 md:gap-3 md:mb-3">
+                          <div>
+                            <p className="text-xs text-gray-600">السعر الآن</p>
+                            <p className="text-3xl font-black text-[#db5f02] md:text-4xl lg:text-5xl">
+                              {slide.newPrice}
+                              <span className="text-lg md:text-2xl"> ج.م</span>
+                            </p>
+                          </div>
+                          <div className="pb-1">
+                            <p className="text-base font-bold text-gray-400 line-through md:text-xl">
+                              {slide.oldPrice}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Savings Badge */}
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl md:gap-2 md:px-4 md:py-2 bg-[#b84f03]">
+                          <span className="text-base md:text-xl">💰</span>
+                          <span className="text-sm font-black text-white md:text-base">
+                            وفر {slide.savings} جنيه
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* CTA Button */}
+                      <div className="flex justify-center md:justify-start">
+                        <Link
+                          href={slide.ctaLink}
+                          className="inline-flex items-center gap-2 px-6 py-3 text-lg font-black text-white transition-transform shadow-2xl md:px-8 md:py-4 rounded-xl bg-[#db5f02] hover:bg-[#b84f03] hover:scale-105 md:text-xl"
+                        >
+                          <span>{slide.ctaText}</span>
+                          <motion.span 
+                            animate={{ x: [0, 5, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                            className="text-xl md:text-2xl"
+                          >
+                            🛒
+                          </motion.span>
+                        </Link>
+                      </div>
+                    </div>
+
+                    {/* Image Side */}
+                    <div className="flex flex-col order-1 gap-4 md:order-2">
+
+                      {/* Image Container */}
+                      <div className="relative p-4 border shadow-2xl bg-white/95 border-[#f3cfb5] rounded-3xl md:p-6">
+                        {/* Discount Badge - On Image */}
+                        {slide.discount && (
+                          <div className="absolute z-10 top-2 left-2 md:top-3 md:left-3">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-2 shadow-2xl rounded-2xl transform -rotate-3 md:gap-2 md:px-4 md:py-2.5 bg-[#b84f03]">
+                              <span className="text-xl md:text-2xl">🔥</span>
+                              <div>
+                                <p className="text-[10px] font-bold text-white/90 md:text-xs">خصم</p>
+                                <p className="text-xl font-black text-white md:text-2xl">{slide.discount}%</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        <OptimizedImage
+                          src={slide.image}
+                          alt={slide.title}
+                          width={400}
+                          height={400}
+                          className="object-contain w-full max-w-[280px] md:max-w-[400px] mx-auto"
+                          priority={index === 0}
+                          quality={90}
+                        />
+                      </div>
+                    </div>
+
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {/* Navigation Section - Compact on Mobile */}
+          <div className="flex items-center justify-center gap-3 mt-3 md:justify-between md:gap-4 md:mt-8">
+            
+            {/* Previous Button */}
+            <button
+              onClick={prevSlide}
+              className="flex items-center justify-center flex-shrink-0 w-8 text-white transition-all border rounded-full bg-white/20 border-white/30 aspect-square backdrop-blur-sm hover:bg-white/30 md:w-14"
+              aria-label="السابق"
+            >
+              <ChevronRightIcon className="w-4 md:w-7" />
+            </button>
+
+            {/* Dots */}
+            <div className="flex gap-1.5 md:gap-2">
+              {heroSlides.map((slide, index) => (
+                <button
+                  key={slide.id}
+                  onClick={() => goToSlide(index)}
+                  className={`rounded-full transition-all ${
+                    index === currentSlide
+                      ? 'w-6 bg-white md:w-10'
+                      : 'w-1.5 bg-white/50 hover:bg-white/75 md:w-2'
+                  } aspect-square md:w-3`}
+                  aria-label={`الانتقال للعرض ${index + 1}`}
+                />
+              ))}
+            </div>
+
+            {/* Next Button */}
+            <button
+              onClick={nextSlide}
+              className="flex items-center justify-center flex-shrink-0 w-8 text-white transition-all border rounded-full bg-white/20 border-white/30 aspect-square backdrop-blur-sm hover:bg-white/30 md:w-14"
+              aria-label="التالي"
+            >
+              <ChevronLeftIcon className="w-4 md:w-7" />
+            </button>
+          </div>
+
+        </div>
+      </section>
