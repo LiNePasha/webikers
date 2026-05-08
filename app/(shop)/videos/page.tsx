@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'فيديوهات WeBikers',
@@ -19,6 +18,7 @@ interface VideoItem {
   embedUrl: string
   thumbnail: string
   acf: Record<string, any>
+  videoType: 'youtube' | 'tiktok' | 'unknown'
 }
 
 interface VideosApiResponse {
@@ -63,6 +63,46 @@ function getYoutubeThumb(url: string): string {
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : ''
 }
 
+function extractTikTokId(url: string): string {
+  if (!url) return ''
+  const fullMatch = url.match(/tiktok\.com\/@[\w.]+\/video\/(\d+)/)
+  const embedMatch = url.match(/tiktok\.com\/embed\/v2\/(\d+)/)
+  return fullMatch?.[1] || embedMatch?.[1] || ''
+}
+
+function isTikTokUrl(url: string): boolean {
+  if (!url) return false
+  return /tiktok\.com|vt\.tiktok\.com|vm\.tiktok\.com/.test(url)
+}
+
+function toTikTokEmbed(url: string): string {
+  if (!url) return ''
+  const id = extractTikTokId(url)
+  return id ? `https://www.tiktok.com/embed/v2/${id}` : ''
+}
+
+async function resolveTikTokUrl(url: string): Promise<string> {
+  if (!isTikTokUrl(url)) return url
+
+  const isShortTikTok = /(?:^https?:\/\/)?(?:vt|vm)\.tiktok\.com\//i.test(url)
+  if (!isShortTikTok) return url
+
+  try {
+    const response = await fetch(url, {
+      redirect: 'follow',
+      headers: {
+        'user-agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+      },
+      next: { revalidate: 300 },
+    })
+
+    return response.url || url
+  } catch {
+    return url
+  }
+}
+
 async function getVideos(): Promise<VideosApiResponse> {
   const wpApiUrl = process.env.NEXT_PUBLIC_WP_API_URL || 'https://api.spare2app.com/wp-json'
 
@@ -89,13 +129,15 @@ async function getVideos(): Promise<VideosApiResponse> {
 
     const json = await response.json()
     const items: VideoItem[] = Array.isArray(json)
-      ? json.map((item: any) => {
+      ? await Promise.all(
+          json.map(async (item: any) => {
           const acf = item?.acf && !Array.isArray(item.acf) ? item.acf : {}
           const contentRendered = String(item?.content?.rendered || '')
           const excerptRendered = String(item?.excerpt?.rendered || '')
           const candidates = [
             acf.video_url,
             acf.youtube_url,
+            acf.tiktok_url,
             acf.embed_url,
             acf.video_link,
             acf.link,
@@ -105,13 +147,40 @@ async function getVideos(): Promise<VideosApiResponse> {
           ]
 
           const valid = candidates.filter((value: unknown): value is string => typeof value === 'string' && value.trim().length > 0)
-          const videoUrl = valid.find((value) => Boolean(extractYouTubeId(value))) || valid[0] || ''
+          
+          // Check for TikTok first, then YouTube, then any valid URL
+          let videoUrl = ''
+          let videoType: 'youtube' | 'tiktok' | 'unknown' = 'unknown'
+          
+          const tiktokUrl = valid.find((value) => isTikTokUrl(value))
+          if (tiktokUrl) {
+            const normalizedTikTokUrl = await resolveTikTokUrl(tiktokUrl)
+            const tiktokId = extractTikTokId(normalizedTikTokUrl)
 
-          const embedUrl = toYoutubeEmbed(String(videoUrl || ''))
+            if (tiktokId) {
+              videoUrl = normalizedTikTokUrl
+              videoType = 'tiktok'
+            }
+          } else {
+            const youtubeUrl = valid.find((value) => Boolean(extractYouTubeId(value)))
+            if (youtubeUrl) {
+              videoUrl = youtubeUrl
+              videoType = 'youtube'
+            } else if (valid.length > 0) {
+              videoUrl = valid[0]
+            }
+          }
+
+          let embedUrl = ''
+          if (videoType === 'youtube') {
+            embedUrl = toYoutubeEmbed(String(videoUrl || ''))
+          } else if (videoType === 'tiktok') {
+            embedUrl = toTikTokEmbed(String(videoUrl || ''))
+          }
 
           const excerpt = stripHtml(excerptRendered)
           const description = stripHtml(contentRendered)
-          const thumb = item?._embedded?.['wp:featuredmedia']?.[0]?.source_url || getYoutubeThumb(videoUrl)
+          const thumb = item?._embedded?.['wp:featuredmedia']?.[0]?.source_url || (videoType === 'youtube' ? getYoutubeThumb(videoUrl) : '')
 
           return {
             id: item.id,
@@ -125,8 +194,10 @@ async function getVideos(): Promise<VideosApiResponse> {
             embedUrl,
             thumbnail: thumb,
             acf,
+            videoType,
           }
         })
+        )
       : []
 
     return {
@@ -179,7 +250,7 @@ export default async function VideosPage() {
           <div className="p-4 mb-6 border border-amber-200 bg-amber-50 rounded-xl">
             <p className="font-bold text-amber-800">تم تحميل {data.items.length} فيديو، لكن {missingVideoCount} بدون رابط فيديو واضح.</p>
             <p className="mt-1 text-sm text-amber-700">
-              أضف في ACF حقل مثل <span className="font-semibold">video_url</span> أو <span className="font-semibold">youtube_url</span>، وتأكد إن Field Group عليه <span className="font-semibold">Show in REST API</span>.
+              أضف في ACF حقل مثل <span className="font-semibold">video_url</span> أو <span className="font-semibold">youtube_url</span> أو <span className="font-semibold">tiktok_url</span>، وتأكد إن Field Group عليه <span className="font-semibold">Show in REST API</span>.
             </p>
           </div>
         )}
@@ -187,13 +258,24 @@ export default async function VideosPage() {
         <div className="grid gap-6 md:grid-cols-2">
           {data.items.map((video) => (
             <article key={video.id} className="overflow-hidden transition-all bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5">
-              {video.embedUrl ? (
+              {video.embedUrl && video.videoType === 'youtube' ? (
                 <div className="bg-black aspect-video">
                   <iframe
                     src={video.embedUrl}
                     title={video.title}
                     className="w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              ) : video.embedUrl && video.videoType === 'tiktok' ? (
+                <div className="bg-black aspect-[9/16] max-h-[85vh] md:max-h-[820px]">
+                  <iframe
+                    src={video.embedUrl}
+                    title={video.title}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    scrolling="no"
                     allowFullScreen
                   />
                 </div>

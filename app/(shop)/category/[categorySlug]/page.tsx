@@ -246,8 +246,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent backdrop-blur-sm">
                   <div className="px-2 py-1.5 text-center">
-                    <p className="text-[10px] font-bold text-amber-400 tracking-wide">إبراهيم</p>
-                    <p className="text-[8px] font-semibold text-white -mt-0.5">شكمان</p>
+                    <p className="text-[10px] font-bold text-amber-400 tracking-wide">WeBikers</p>
                   </div>
                 </div>
               </div>
@@ -284,7 +283,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           <div className="relative max-w-2xl mx-auto">
             <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
               {isSearching ? (
-                <div className="w-5 h-5 border-2 border-brand-500 rounded-full animate-spin border-t-transparent" />
+                <div className="w-5 h-5 border-2 rounded-full border-brand-500 animate-spin border-t-transparent" />
               ) : (
                 <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
               )}

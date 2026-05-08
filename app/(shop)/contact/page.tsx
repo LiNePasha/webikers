@@ -36,8 +36,8 @@ export default function ContactPage() {
     {
       icon: MapPinIcon,
       title: 'العنوان',
-      value: '17 شارع النور الدقي, مصر',
-      href: null,
+      value: '17 شارع ميشيل باخوم - الدقي - الجيزة',
+      href: 'https://maps.app.goo.gl/ugrxcSb7P1JChodH7',
       color: 'from-orange-500 to-red-600',
       bgColor: 'bg-orange-50',
       borderColor: 'border-orange-200',
@@ -46,7 +46,7 @@ export default function ContactPage() {
     {
       icon: ClockIcon,
       title: 'أوقات العمل',
-      value: 'الأتنين - السبت: 9 صباحاً - 6 مساءً',
+      value: 'يومياً: 10:00 صباحاً - 10:00 مساءً',
       href: null,
       color: 'from-purple-500 to-pink-600',
       bgColor: 'bg-purple-50',
@@ -206,7 +206,17 @@ export default function ContactPage() {
                   <MapPinIcon className="w-8 h-8" />
                 </div>
                 <h3 className="mb-2 text-xl font-bold text-gray-900">موقعنا</h3>
-                <p className="mb-4 text-gray-600">شارع بولاق الجديد</p>
+                <p className="mb-2 text-gray-600">17 شارع ميشيل باخوم</p>
+                <p className="mb-4 text-sm text-gray-500">ناصية شارع إيران - الدقي - الجيزة</p>
+                <a
+                  href="https://maps.app.goo.gl/ugrxcSb7P1JChodH7"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 font-bold text-white transition-all duration-300 shadow-lg bg-gradient-to-r from-orange-500 to-red-600 rounded-xl hover:from-orange-600 hover:to-red-700 hover:scale-105"
+                >
+                  <MapPinIcon className="w-5 h-5" />
+                  <span>فتح الخريطة</span>
+                </a>
               </div>
             </div>
           </motion.div>
