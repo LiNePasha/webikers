@@ -162,12 +162,6 @@ export default function OrderSummary({
         </div>
       </div>
       
-      {/* VAT Notice */}
-      <div className="pt-4 mt-6 border-t border-gray-200">
-        <p className="text-xs text-center text-gray-500">
-          السعر شامل ضريبة القيمة المضافة
-        </p>
-      </div>
       
       {/* Vendor Info (if single vendor) */}
       {/* {cartItems.length > 0 && cartItems[0].vendor && (

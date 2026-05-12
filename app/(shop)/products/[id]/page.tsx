@@ -563,9 +563,6 @@ export default function ProductPage({ params }: ProductPageProps) {
                   )}
                 </div>
               )}
-              <div className="mt-2 text-sm text-gray-600">
-                السعر شامل الضريبة
-              </div>
             </div>
 
             {/* Variation Selector for Variable Products */}
