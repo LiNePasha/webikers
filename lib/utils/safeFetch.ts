@@ -4,12 +4,17 @@ export async function safeFetch<T>(
   options?: RequestInit
 ): Promise<{ data: T | null; error: string | null; status: number }> {
   try {
+    // Don't set Content-Type when body is FormData — browser sets it automatically
+    // with the correct multipart/form-data boundary
+    const isFormData = options?.body instanceof FormData
     const response = await fetch(url, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
+      headers: isFormData
+        ? { ...options?.headers }
+        : {
+            'Content-Type': 'application/json',
+            ...options?.headers,
+          },
     })
 
     // Handle non-OK responses
