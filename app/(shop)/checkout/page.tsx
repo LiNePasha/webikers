@@ -1672,7 +1672,7 @@ export default function CheckoutPage() {
       </div>
       
       {/* Fixed Bottom Button - Mobile & Tablet */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-50 text-black lg:hidden">
         <div className="bg-white border-t-2 border-gray-200 shadow-2xl">
           {/* Collapsible Order Summary - Mobile */}
           {showOrderSummary && (
@@ -1691,9 +1691,9 @@ export default function CheckoutPage() {
             {/* Toggle Order Summary Button */}
             <button
               onClick={() => setShowOrderSummary(!showOrderSummary)}
-              className="w-full px-4 py-3 mb-3 text-sm font-semibold text-center transition-all border-2 border-gray-300 bg-gray-50 hover:bg-gray-100 rounded-xl"
+              className="w-full px-4 py-3 mb-3 text-sm font-semibold text-center text-black transition-all border-2 border-gray-300 bg-gray-50 hover:bg-gray-100 rounded-xl"
             >
-              <span className="flex items-center justify-center gap-2">
+              <span className="flex items-center justify-center gap-2 text-black">
                 {showOrderSummary ? (
                   <>
                     <ChevronDownIcon className="w-5 h-5" />

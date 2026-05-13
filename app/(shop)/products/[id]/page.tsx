@@ -83,6 +83,14 @@ export default function ProductPage({ params }: ProductPageProps) {
     ? selectedVariation.sale_price
     : product?.sale_price
 
+  const cleanedPriceHtml = product?.price_html
+    ? product.price_html
+        .replace(/<[^>]+>/g, '')
+        .replace(/EGP\s*/g, '')
+        .replace(/جنيه\s*$/g, '')
+        .trim()
+    : null
+
   // Handle variation selection
   const handleVariationSelect = (variation: ProductVariation | null, attributes: Record<string, string>) => {
     setSelectedVariation(variation)
@@ -551,10 +559,13 @@ export default function ProductPage({ params }: ProductPageProps) {
               ) : (
                 <div className="flex items-center justify-between">
                   <span className="text-3xl font-bold lg:text-4xl text-brand-600">
-                    {isVariableProduct && !selectedVariation 
-                      ? `${wooCommerceAPI.formatPrice(product.price)} - ${wooCommerceAPI.formatPrice(product.price_html.match(/\d+/g)?.slice(-1)[0] || product.price)}`
-                      : wooCommerceAPI.formatPrice(effectivePrice || '0')
-                    }
+                    {isVariableProduct && !selectedVariation ? (
+                      cleanedPriceHtml ?
+                        `${cleanedPriceHtml} جنيه` :
+                        wooCommerceAPI.formatPrice(product.price || '0')
+                    ) : (
+                      wooCommerceAPI.formatPrice(effectivePrice || '0')
+                    )}
                   </span>
                   {product.featured && (
                     <span className="px-3 py-1 text-sm font-bold text-white bg-yellow-500 rounded-full">

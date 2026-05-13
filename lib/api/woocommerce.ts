@@ -503,6 +503,14 @@ export class WooCommerceAPI {
 
   formatPrice(price: string | number, currency: string = 'EGP'): string {
     const numPrice = typeof price === 'string' ? parseFloat(price) : price
+    const formatted = new Intl.NumberFormat('ar-EG', {
+      minimumFractionDigits: 0,
+    }).format(numPrice)
+
+    if (currency === 'EGP') {
+      return `${formatted} جنيه`
+    }
+
     return new Intl.NumberFormat('ar-EG', {
       style: 'currency',
       currency: currency,
