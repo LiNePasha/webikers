@@ -63,6 +63,10 @@ const navigation = {
   pages: [
     { name: 'الرئيسية', href: '/' },
     { name: 'جميع المنتجات', href: '/products' },
+    { name: 'الفيديوهات', href: '/videos' },
+    { name: 'سوق الاسكوترات', href: '/scooters-market' },
+    { name: 'اسكوترات جديدة', href: '/scooters-market/new' },
+    { name: 'اسكوترات مستعملة', href: '/scooters-market/used' },
     { name: 'من نحن', href: '/about' },
     { name: 'اتصل بنا', href: '/contact' }
   ]
